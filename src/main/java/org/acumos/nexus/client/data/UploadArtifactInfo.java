@@ -31,7 +31,7 @@ public class UploadArtifactInfo {
 	private String packaging;
 	private String artifactMvnPath;
 	private long contentlength;
-	
+
 	public UploadArtifactInfo(String groupId, String artifactId, String version, String packaging,
 			String artifactMvnPath, long contentlength) {
 		super();
@@ -42,78 +42,95 @@ public class UploadArtifactInfo {
 		this.artifactMvnPath = artifactMvnPath;
 		this.contentlength = contentlength;
 	}
+
 	/**
 	 * @return the groupId
 	 */
 	public String getGroupId() {
 		return groupId;
 	}
+
 	/**
-	 * @param groupId the groupId to set
+	 * @param groupId
+	 *            the groupId to set
 	 */
 	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
+
 	/**
 	 * @return the artifactId
 	 */
 	public String getArtifactId() {
 		return artifactId;
 	}
+
 	/**
-	 * @param artifactId the artifactId to set
+	 * @param artifactId
+	 *            the artifactId to set
 	 */
 	public void setArtifactId(String artifactId) {
 		this.artifactId = artifactId;
 	}
+
 	/**
 	 * @return the version
 	 */
 	public String getVersion() {
 		return version;
 	}
+
 	/**
-	 * @param version the version to set
+	 * @param version
+	 *            the version to set
 	 */
 	public void setVersion(String version) {
 		this.version = version;
 	}
+
 	/**
 	 * @return the packaging
 	 */
 	public String getPackaging() {
 		return packaging;
 	}
+
 	/**
-	 * @param packaging the packaging to set
+	 * @param packaging
+	 *            the packaging to set
 	 */
 	public void setPackaging(String packaging) {
 		this.packaging = packaging;
 	}
+
 	/**
 	 * @return the artifactMvnPath
 	 */
 	public String getArtifactMvnPath() {
 		return artifactMvnPath;
 	}
+
 	/**
-	 * @param artifactMvnPath the artifactMvnPath to set
+	 * @param artifactMvnPath
+	 *            the artifactMvnPath to set
 	 */
 	public void setArtifactMvnPath(String artifactMvnPath) {
 		this.artifactMvnPath = artifactMvnPath;
 	}
+
 	/**
 	 * @return the contentlength
 	 */
 	public long getContentlength() {
 		return this.contentlength;
 	}
+
 	/**
-	 * @param contentlength the contentlength to set
+	 * @param contentlength
+	 *            the contentlength to set
 	 */
 	public void setContentlength(long contentlength) {
-		contentlength = contentlength;
+		this.contentlength = contentlength;
 	}
-	
-	
+
 }

@@ -18,18 +18,43 @@
  * ===============LICENSE_END=========================================================
  */
 
-package org.acumos.nexus.client;
+package org.acumos.nexus.client.data;
 
 /**
  * The Class RepositoryLocation.
  */
 public class RepositoryLocation {
-	
+
 	private String id;
 	private String url;
 	private String username;
 	private String password;
 	private String proxy;
+
+	public RepositoryLocation() {
+	}
+
+	/**
+	 * Convenience constructor
+	 * 
+	 * @param id
+	 *            Repository ID
+	 * @param url
+	 *            Repository URL
+	 * @param username
+	 *            Repository username for authentication
+	 * @param password
+	 *            Repository password for authentication
+	 * @param proxy
+	 *            Nexus proxy
+	 */
+	public RepositoryLocation(String id, String url, String username, String password, String proxy) {
+		this.id = id;
+		this.url = url;
+		this.username = username;
+		this.password = password;
+		this.proxy = proxy;
+	}
 
 	/**
 	 * Gets the id.
@@ -106,7 +131,7 @@ public class RepositoryLocation {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	/**
 	 * @return the proxy
 	 */
@@ -124,7 +149,7 @@ public class RepositoryLocation {
 
 	@Override
 	public String toString() {
-		return "RepositoryLocation [id=" + id + ", url=" + url + ", username="
-				+ username + ", password=" + password + ", proxy=" + proxy + "]";
+		return "RepositoryLocation[id=" + id + ", url=" + url + ", username=" + username + ", password=" + password
+				+ ", proxy=" + proxy + "]";
 	}
 }
