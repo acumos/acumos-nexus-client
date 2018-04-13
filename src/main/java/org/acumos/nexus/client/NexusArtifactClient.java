@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.acumos.nexus.client.data.RepositoryLocation;
 import org.acumos.nexus.client.data.UploadArtifactInfo;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -36,50 +37,41 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.wagon.ConnectionException;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.StreamingWagon;
+import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.springframework.web.client.RestTemplate;
 
 public class NexusArtifactClient {
-	private String nexusRepoHost;
-	private String nexusRepoPort;
-	private String nexusRepoHttpScheme;
-	private String nexusArtifactRepo;
-	private RepositoryLocation repositoryLocation;
+
+	private final RepositoryLocation repositoryLocation;
 	private final RestTemplate restTemplate;
 
 	/**
-	 * @param nexusRepoHost
-	 *            Nexus Repository Host e.g example.com
-	 * @param nexusRepoPort
-	 *            Nexus Repository Port e.g 8081
-	 * @param nexusRepoHttpScheme
-	 *            Nexus Repository Scheme Http or Https
-	 * @param nexusArtifactRepo
-	 *            Nexus Artifact Repository Location e.g Acumos
+	 * Builds an instance of the client with the supplied repository location
+	 * 
+	 * @param repoLoc
+	 *            Repository location including URL and credentials.
 	 */
-	public NexusArtifactClient(String nexusRepoHost, String nexusRepoPort, String nexusRepoHttpScheme,
-			String nexusArtifactRepo) {
-		this.nexusRepoHost = nexusRepoHost;
-		this.nexusRepoPort = nexusRepoPort;
-		this.nexusRepoHttpScheme = nexusRepoHttpScheme;
-		this.nexusArtifactRepo = nexusArtifactRepo;
-
+	public NexusArtifactClient(RepositoryLocation repoLoc) {
+		this.repositoryLocation = repoLoc;
 		URL url = null;
 		try {
-			url = new URL(repositoryLocation.getUrl());
+			url = new URL(repoLoc.getUrl());
 		} catch (MalformedURLException ex) {
-			throw new RuntimeException("Failed to parse URL", ex);
+			throw new IllegalArgumentException("Failed to parse URL", ex);
 		}
 		final HttpHost httpHost = new HttpHost(url.getHost(), url.getPort());
 
 		// Build a client with a credentials provider
 		CloseableHttpClient httpClient = null;
-		if (repositoryLocation.getUsername() != null && repositoryLocation.getPassword() != null) {
+		if (repoLoc.getUsername() != null && repoLoc.getPassword() != null) {
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(httpHost), new UsernamePasswordCredentials(
-					repositoryLocation.getUsername(), repositoryLocation.getPassword()));
+			credsProvider.setCredentials(new AuthScope(httpHost),
+					new UsernamePasswordCredentials(repoLoc.getUsername(), repoLoc.getPassword()));
 			httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(credsProvider).build();
 		} else {
 			httpClient = HttpClientBuilder.create().build();
@@ -92,74 +84,11 @@ public class NexusArtifactClient {
 		// Put the factory in the template
 		restTemplate = new RestTemplate();
 		restTemplate.setRequestFactory(requestFactory);
-
-	}
-
-	public NexusArtifactClient(RepositoryLocation repositoryLocation) {
-		this.repositoryLocation = repositoryLocation;
-
-		URL url = null;
-		try {
-			url = new URL(repositoryLocation.getUrl());
-		} catch (MalformedURLException ex) {
-			throw new RuntimeException("Failed to parse URL", ex);
-		}
-		final HttpHost httpHost = new HttpHost(url.getHost(), url.getPort());
-
-		// Build a client with a credentials provider
-		CloseableHttpClient httpClient = null;
-		if (repositoryLocation.getUsername() != null && repositoryLocation.getPassword() != null) {
-			CredentialsProvider credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(httpHost), new UsernamePasswordCredentials(
-					repositoryLocation.getUsername(), repositoryLocation.getPassword()));
-			httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(credsProvider).build();
-		} else {
-			httpClient = HttpClientBuilder.create().build();
-		}
-		// Create request factory
-		HttpComponentsClientHttpRequestFactoryBasicAuth requestFactory = new HttpComponentsClientHttpRequestFactoryBasicAuth(
-				httpHost);
-		requestFactory.setHttpClient(httpClient);
-
-		// Put the factory in the template
-		restTemplate = new RestTemplate();
-		restTemplate.setRequestFactory(requestFactory);
-
-	}
-
-	public String getNexusRepoHost() {
-		return nexusRepoHost;
-	}
-
-	public void setNexusRepoHost(String nexusRepoHost) {
-		this.nexusRepoHost = nexusRepoHost;
-	}
-
-	public String getNexusRepoPort() {
-		return nexusRepoPort;
-	}
-
-	public void setNexusRepoPort(String nexusRepoPort) {
-		this.nexusRepoPort = nexusRepoPort;
-	}
-
-	public String getNexusRepoHttpScheme() {
-		return nexusRepoHttpScheme;
-	}
-
-	public void setNexusRepoHttpScheme(String nexusRepoHttpScheme) {
-		this.nexusRepoHttpScheme = nexusRepoHttpScheme;
-	}
-
-	public String getNexusArtifactRepo() {
-		return nexusArtifactRepo;
-	}
-
-	public void setNexusArtifactRepo(String nexusArtifactRepo) {
-		this.nexusArtifactRepo = nexusArtifactRepo;
 	}
 
 	/**
+	 * Uploads an artifact from a stream.
+	 * 
 	 * @param groupId
 	 *            GroupId where the Artifacts needs to stored.
 	 * @param artifactId
@@ -173,62 +102,64 @@ public class NexusArtifactClient {
 	 * @param inputStream
 	 *            InputStream containing artifact
 	 * @return UploadArtifactInfo
+	 * @throws AuthenticationException
+	 *             On failure to authenticate
+	 * @throws AuthorizationException
+	 *             On failure to authorize
 	 * @throws ConnectionException
 	 *             On failure to connect
+	 * @throws ResourceDoesNotExistException
+	 *             On failure to find resource
+	 * @throws TransferFailedException
+	 *             On failure to transfer
 	 */
 	public UploadArtifactInfo uploadArtifact(String groupId, String artifactId, String version, String packaging,
-			long contentLength, InputStream inputStream) throws ConnectionException {
+			long contentLength, InputStream inputStream) throws AuthenticationException, AuthorizationException,
+			ConnectionException, TransferFailedException, ResourceDoesNotExistException {
 		StreamingWagon streamWagon = null;
 		UploadArtifactInfo artifactInfo = null;
 		try {
 			String mvnPath = MvnRepoWagonConnectionManager.createMvnPath(groupId, artifactId, version, packaging);
-			artifactInfo = new UploadArtifactInfo(groupId, artifactId, version, packaging, mvnPath, 180000);
-			if (repositoryLocation != null) {
-				streamWagon = MvnRepoWagonConnectionManager.createWagon(repositoryLocation);
-			} else {
-				// TODO Need to add a new method to create Wagon based on the Parameters
-			}
+			artifactInfo = new UploadArtifactInfo(groupId, artifactId, version, packaging, mvnPath, contentLength);
+			streamWagon = MvnRepoWagonConnectionManager.createWagon(repositoryLocation);
 			streamWagon.putFromStream(inputStream, mvnPath, contentLength, -1);
-		} catch (ConnectionException e) {
-			// TODO Auto-generated catch block
-
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-
 		} finally {
 			IOUtil.close(inputStream);
-			streamWagon.disconnect();
+			if (streamWagon != null)
+				streamWagon.disconnect();
 		}
 		return artifactInfo;
-
 	}
 
-	public ByteArrayOutputStream getArtifact(String artifactReference) throws ConnectionException {
+	/**
+	 * Gets the artifact by path and stores in memory.
+	 * 
+	 * @param artifactReference
+	 *            artifactPath
+	 * @return Stream of bytes
+	 * @throws AuthenticationException
+	 *             On failure to authenticate
+	 * @throws AuthorizationException
+	 *             On failure to authorize
+	 * @throws ConnectionException
+	 *             On failure to connect
+	 * @throws ResourceDoesNotExistException
+	 *             On failure to find resource
+	 * @throws TransferFailedException
+	 *             On failure to transfer
+	 */
+	public ByteArrayOutputStream getArtifact(String artifactReference) throws AuthenticationException,
+			ConnectionException, ResourceDoesNotExistException, TransferFailedException, AuthorizationException {
 		StreamingWagon streamWagon = null;
 		ByteArrayOutputStream outputStream = null;
 		try {
-			if (repositoryLocation != null) {
-				streamWagon = MvnRepoWagonConnectionManager.createWagon(repositoryLocation);
-			} else {
-				// TODO Need to add a new method to create Wagon based on the Parameters
-			}
+			streamWagon = MvnRepoWagonConnectionManager.createWagon(repositoryLocation);
 			outputStream = new ByteArrayOutputStream();
 			streamWagon.getToStream(artifactReference, outputStream);
-		} catch (ConnectionException e) {
-			// TODO Auto-generated catch block
-
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-
 		} finally {
 			IOUtil.close(outputStream);
-			streamWagon.disconnect();
+			if (streamWagon != null)
+				streamWagon.disconnect();
 		}
 		return outputStream;
 	}
@@ -237,22 +168,18 @@ public class NexusArtifactClient {
 	 * Deletes Artifacts from Nexus Repository
 	 * 
 	 * @param artifactReference
-	 *            : Artifact path to be deleted
-	 * @throws URISyntaxException 
-	 *             on bad URI
+	 *            Artifact path to be deleted
+	 * @throws URISyntaxException
+	 *             If full path cannot be parsed as URI
 	 */
-	public void deleteArtifact(String artifactReference) throws URISyntaxException  {
-
+	public void deleteArtifact(String artifactReference) throws URISyntaxException {
+		if (artifactReference == null)
+			throw new IllegalArgumentException("artifactReference cannot be null");
 		if (restTemplate != null && artifactReference != null) {
-			URI url = null;
-			if (repositoryLocation.getUrl().endsWith("/")) {
-				url = new URI(repositoryLocation.getUrl() + artifactReference);
-			} else {
-				url = new URI(repositoryLocation.getUrl() + "/" + artifactReference);
-			}
+			URI url = new URI(repositoryLocation.getUrl() + (repositoryLocation.getUrl().endsWith("/") ? "" : "/")
+					+ artifactReference);
 			restTemplate.delete(url);
 		}
-
 	}
 
 }

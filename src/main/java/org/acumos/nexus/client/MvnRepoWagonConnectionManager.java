@@ -20,6 +20,7 @@
 
 package org.acumos.nexus.client;
 
+import org.acumos.nexus.client.data.RepositoryLocation;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.StreamWagon;
 import org.apache.maven.wagon.StreamingWagon;
@@ -27,7 +28,9 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.providers.ftp.FtpWagon;
-import org.apache.maven.wagon.providers.http.HttpWagon;
+import org.apache.maven.wagon.providers.http.LightweightHttpWagon;
+import org.apache.maven.wagon.providers.http.LightweightHttpWagonAuthenticator;
+import org.apache.maven.wagon.providers.http.LightweightHttpsWagon;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 
@@ -35,6 +38,7 @@ import org.apache.maven.wagon.repository.Repository;
  * The Class MvnRepoWagonConnectionManager.
  */
 public class MvnRepoWagonConnectionManager {
+
 	private static StreamingWagon testWagon;
 
 	/**
@@ -56,25 +60,26 @@ public class MvnRepoWagonConnectionManager {
 	 */
 	public static StreamingWagon createWagon(RepositoryLocation repo)
 			throws ConnectionException, AuthenticationException {
-		Repository repository = new Repository(repo.getId(), repo.getUrl());
-		AuthenticationInfo authenticationInfo = new AuthenticationInfo();
-		authenticationInfo.setUserName(repo.getUsername());
-		authenticationInfo.setPassword(repo.getPassword());
 
-		if (testWagon != null) {
+		if (testWagon != null)
 			return testWagon;
-		}
-		StreamWagon wagon;
-		if (repo.getUrl().startsWith("http://") || repo.getUrl().startsWith("https://")) {
-			wagon = new HttpWagon();
-		} else if (repo.getUrl().startsWith("ftp://")) {
-			wagon = new FtpWagon();
-		} else if (repo.getUrl().startsWith("file://")) {
-			wagon = new FileWagon();
-		} else {
-			throw new IllegalStateException(
-					"Unknown protocol in repository url: " + repo.getUrl());
-		}
+
+		Repository repository = new Repository(repo.getId(), repo.getUrl());
+		StreamWagon streamWagon;
+		if (repo.getUrl().startsWith("http:")) {
+			LightweightHttpWagon lw = new LightweightHttpWagon();
+			lw.setAuthenticator(new LightweightHttpWagonAuthenticator());
+			streamWagon = lw;
+		} else if (repo.getUrl().startsWith("https:")) {
+			LightweightHttpsWagon lw = new LightweightHttpsWagon();
+			lw.setAuthenticator(new LightweightHttpWagonAuthenticator());
+			streamWagon = lw;
+		} else if (repo.getUrl().startsWith("ftp:"))
+			streamWagon = new FtpWagon();
+		else if (repo.getUrl().startsWith("file:"))
+			streamWagon = new FileWagon();
+		else
+			throw new IllegalStateException("Unknown protocol in repository url: " + repo.getUrl());
 
 		if (repo.getProxy() != null && !repo.getProxy().isEmpty()) {
 			ProxyInfo proxy = new ProxyInfo();
@@ -82,41 +87,43 @@ public class MvnRepoWagonConnectionManager {
 			proxy.setType(all[0]);
 			proxy.setHost(all[1].replaceFirst("//", ""));
 			proxy.setPort(Integer.valueOf(all[2]));
-			wagon.connect(repository, proxy);
+			streamWagon.connect(repository, proxy);
 		} else {
-			wagon.connect(repository, authenticationInfo);
+			AuthenticationInfo authenticationInfo = new AuthenticationInfo();
+			authenticationInfo.setUserName(repo.getUsername());
+			authenticationInfo.setPassword(repo.getPassword());
+			streamWagon.connect(repository, authenticationInfo);
 		}
 
-		return wagon;
+		return streamWagon;
 	}
 
 	/**
 	 * Creates maven path for a given artifact.
 	 * 
-	 * @param groupId 
-	 * 			GroupId for the Artifact
+	 * @param groupId
+	 *            GroupId for the Artifact
 	 * @param artifactId
-	 * 			Artifact Id for the artifact
+	 *            Artifact Id for the artifact
 	 * @param version
-	 * 			Version for the artifact
+	 *            Version for the artifact
 	 * @param packaging
-	 * 			packaging for artifact e.g jar, war etc
+	 *            packaging for artifact e.g jar, war etc
 	 * @return Maven path for the specified artifact
 	 */
 	public static String createMvnPath(String groupId, String artifactId, String version, String packaging) {
 		StringBuilder buffer = new StringBuilder();
-
 		buffer.append(groupId.replace(".", "/")).append("/");
 		buffer.append(artifactId).append("/");
 		buffer.append(version).append("/");
 		buffer.append(artifactId).append("-");
 		buffer.append(version).append(".").append(packaging);
-
 		return buffer.toString();
 	}
 
 	/**
-	 * @param testWagon the testWagon to set
+	 * @param testWagon
+	 *            the testWagon to set
 	 */
 	public static void setTestWagon(StreamingWagon testWagon) {
 		MvnRepoWagonConnectionManager.testWagon = testWagon;
