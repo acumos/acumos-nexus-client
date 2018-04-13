@@ -112,7 +112,7 @@ public class UploadArtifactInfo {
 	 * @param contentlength the contentlength to set
 	 */
 	public void setContentlength(long contentlength) {
-		contentlength = contentlength;
+		this.contentlength = contentlength;
 	}
 	
 	

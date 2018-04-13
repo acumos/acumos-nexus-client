@@ -36,12 +36,16 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.wagon.ConnectionException;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.StreamingWagon;
+import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.springframework.web.client.RestTemplate;
 
 public class NexusArtifactClient {
+
 	private String nexusRepoHost;
 	private String nexusRepoPort;
 	private String nexusRepoHttpScheme;
@@ -51,13 +55,13 @@ public class NexusArtifactClient {
 
 	/**
 	 * @param nexusRepoHost
-	 *            Nexus Repository Host e.g example.com
+	 *            Nexus Repository Host; e.g., example.com
 	 * @param nexusRepoPort
-	 *            Nexus Repository Port e.g 8081
+	 *            Nexus Repository Port; e.g., 8081
 	 * @param nexusRepoHttpScheme
-	 *            Nexus Repository Scheme Http or Https
+	 *            Nexus Repository Scheme: http or https
 	 * @param nexusArtifactRepo
-	 *            Nexus Artifact Repository Location e.g Acumos
+	 *            Nexus Artifact Repository Location; e.g., Acumos
 	 */
 	public NexusArtifactClient(String nexusRepoHost, String nexusRepoPort, String nexusRepoHttpScheme,
 			String nexusArtifactRepo) {
@@ -92,12 +96,10 @@ public class NexusArtifactClient {
 		// Put the factory in the template
 		restTemplate = new RestTemplate();
 		restTemplate.setRequestFactory(requestFactory);
-
 	}
 
 	public NexusArtifactClient(RepositoryLocation repositoryLocation) {
 		this.repositoryLocation = repositoryLocation;
-
 		URL url = null;
 		try {
 			url = new URL(repositoryLocation.getUrl());
@@ -124,7 +126,6 @@ public class NexusArtifactClient {
 		// Put the factory in the template
 		restTemplate = new RestTemplate();
 		restTemplate.setRequestFactory(requestFactory);
-
 	}
 
 	public String getNexusRepoHost() {
@@ -173,62 +174,55 @@ public class NexusArtifactClient {
 	 * @param inputStream
 	 *            InputStream containing artifact
 	 * @return UploadArtifactInfo
+	 * @throws AuthenticationException
+	 *             On failure to authenticate
+	 * @throws AuthorizationException
+	 *             On failure to authorize
 	 * @throws ConnectionException
 	 *             On failure to connect
+	 * @throws ResourceDoesNotExistException
+	 *             On failure to find resource
+	 * @throws TransferFailedException
+	 *             On failure to transfer
 	 */
 	public UploadArtifactInfo uploadArtifact(String groupId, String artifactId, String version, String packaging,
-			long contentLength, InputStream inputStream) throws ConnectionException {
+			long contentLength, InputStream inputStream) throws AuthenticationException, AuthorizationException,
+			ConnectionException, TransferFailedException, ResourceDoesNotExistException {
 		StreamingWagon streamWagon = null;
 		UploadArtifactInfo artifactInfo = null;
 		try {
 			String mvnPath = MvnRepoWagonConnectionManager.createMvnPath(groupId, artifactId, version, packaging);
-			artifactInfo = new UploadArtifactInfo(groupId, artifactId, version, packaging, mvnPath, 180000);
+			artifactInfo = new UploadArtifactInfo(groupId, artifactId, version, packaging, mvnPath, contentLength);
 			if (repositoryLocation != null) {
 				streamWagon = MvnRepoWagonConnectionManager.createWagon(repositoryLocation);
 			} else {
-				// TODO Need to add a new method to create Wagon based on the Parameters
+				throw new UnsupportedOperationException("add a new method to create Wagon based on the Parameters");
 			}
 			streamWagon.putFromStream(inputStream, mvnPath, contentLength, -1);
-		} catch (ConnectionException e) {
-			// TODO Auto-generated catch block
-
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-
 		} finally {
 			IOUtil.close(inputStream);
-			streamWagon.disconnect();
+			if (streamWagon != null)
+				streamWagon.disconnect();
 		}
 		return artifactInfo;
-
 	}
 
-	public ByteArrayOutputStream getArtifact(String artifactReference) throws ConnectionException {
+	public ByteArrayOutputStream getArtifact(String artifactReference) throws AuthenticationException,
+			ConnectionException, ResourceDoesNotExistException, TransferFailedException, AuthorizationException {
 		StreamingWagon streamWagon = null;
 		ByteArrayOutputStream outputStream = null;
 		try {
 			if (repositoryLocation != null) {
 				streamWagon = MvnRepoWagonConnectionManager.createWagon(repositoryLocation);
 			} else {
-				// TODO Need to add a new method to create Wagon based on the Parameters
+				throw new UnsupportedOperationException("add a new method to create Wagon based on the Parameters");
 			}
 			outputStream = new ByteArrayOutputStream();
 			streamWagon.getToStream(artifactReference, outputStream);
-		} catch (ConnectionException e) {
-			// TODO Auto-generated catch block
-
-		} catch (AuthenticationException e) {
-			// TODO Auto-generated catch block
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-
 		} finally {
 			IOUtil.close(outputStream);
-			streamWagon.disconnect();
+			if (streamWagon != null)
+				streamWagon.disconnect();
 		}
 		return outputStream;
 	}
@@ -238,11 +232,10 @@ public class NexusArtifactClient {
 	 * 
 	 * @param artifactReference
 	 *            : Artifact path to be deleted
-	 * @throws URISyntaxException 
+	 * @throws URISyntaxException
 	 *             on bad URI
 	 */
-	public void deleteArtifact(String artifactReference) throws URISyntaxException  {
-
+	public void deleteArtifact(String artifactReference) throws URISyntaxException {
 		if (restTemplate != null && artifactReference != null) {
 			URI url = null;
 			if (repositoryLocation.getUrl().endsWith("/")) {
@@ -252,7 +245,6 @@ public class NexusArtifactClient {
 			}
 			restTemplate.delete(url);
 		}
-
 	}
 
 }
