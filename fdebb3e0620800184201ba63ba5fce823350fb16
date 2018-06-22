@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c8ec470_b9aee097",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-06-22T17:41:45Z",
+      "side": 1,
+      "message": "this repo is part of the Common Services project. Guy Jacobson (ATT) is the PTL.https://wiki.acumos.org/display/TSC/PTL+Nominations",
+      "range": {
+        "startLine": 7,
+        "startChar": 3,
+        "endLine": 11,
+        "endChar": 16
+      },
+      "revId": "fdebb3e0620800184201ba63ba5fce823350fb16",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "23013697_e7a229b9",
+        "filename": "INFO.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 94
+      },
+      "writtenOn": "2018-06-22T17:41:45Z",
+      "side": 1,
+      "message": "#acumos would be a better channel to list here",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 22
+      },
+      "revId": "fdebb3e0620800184201ba63ba5fce823350fb16",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
+    }
+  ]
+}
