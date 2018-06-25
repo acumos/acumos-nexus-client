@@ -22,6 +22,30 @@
       "revId": "d812411a0c6fc60100584a48a6040b41570c958e",
       "serverId": "655300a2-7a56-4504-9153-881edd907bea",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4c1d2fa8_c117141d",
+        "filename": "INFO.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 85
+      },
+      "writtenOn": "2018-06-25T18:18:35Z",
+      "side": 1,
+      "message": "The IANA time zone identifier for Pune is Asia/Kolkata\n\nWill update to that",
+      "parentUuid": "86066883_41ce2446",
+      "range": {
+        "startLine": 55,
+        "startChar": 16,
+        "endLine": 55,
+        "endChar": 18
+      },
+      "revId": "d812411a0c6fc60100584a48a6040b41570c958e",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": false
     }
   ]
 }
