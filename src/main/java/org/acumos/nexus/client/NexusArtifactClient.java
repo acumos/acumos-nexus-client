@@ -58,6 +58,8 @@ public class NexusArtifactClient {
 	 */
 	public NexusArtifactClient(RepositoryLocation repoLoc) {
 		this.repositoryLocation = repoLoc;
+		
+		// Build a restTemplate for use by the delete method
 		URL url = null;
 		try {
 			url = new URL(repoLoc.getUrl());

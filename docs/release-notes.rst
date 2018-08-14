@@ -20,6 +20,11 @@
 Nexus Client Release Notes
 ==========================
 
+Version 2.2.1, 14 Aug 2018
+--------------------------
+
+* Set pre-emptive authentication on Nexus requests
+
 Version 2.2.0, 11 Jun 2018
 --------------------------
 

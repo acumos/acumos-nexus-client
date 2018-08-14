@@ -68,10 +68,14 @@ public class MvnRepoWagonConnectionManager {
 		if (repo.getUrl().startsWith("http:")) {
 			LightweightHttpWagon lw = new LightweightHttpWagon();
 			lw.setAuthenticator(new LightweightHttpWagonAuthenticator());
+			// Always send credentials
+			lw.setPreemptiveAuthentication(true);
 			streamWagon = lw;
 		} else if (repo.getUrl().startsWith("https:")) {
 			LightweightHttpsWagon lw = new LightweightHttpsWagon();
 			lw.setAuthenticator(new LightweightHttpWagonAuthenticator());
+			// Always send credentials
+			lw.setPreemptiveAuthentication(true);
 			streamWagon = lw;
 		} else if (repo.getUrl().startsWith("ftp:"))
 			streamWagon = new FtpWagon();
