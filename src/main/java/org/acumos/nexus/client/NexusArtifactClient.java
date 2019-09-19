@@ -206,13 +206,17 @@ public class NexusArtifactClient {
 	 * @throws URISyntaxException
 	 *             If full path cannot be parsed as URI
 	 */
-	public void deleteArtifact(String artifactReference) throws URISyntaxException {
+	public void deleteArtifact(String artifactReference) throws Exception {
+		log.info("inside NexusArtifactClient---deleteArtifact -->>");
 		if (artifactReference == null)
-			throw new IllegalArgumentException("artifactReference cannot be null");
+			throw new IllegalArgumentException("artifactReference cannot be null");		
+			
 		if (restTemplate != null && artifactReference != null) {
+			log.info("----artifactReference -->>" + artifactReference);
 			URI url = new URI(repositoryLocation.getUrl() + (repositoryLocation.getUrl().endsWith("/") ? "" : "/")
 					+ artifactReference);
-			restTemplate.delete(url);
+			log.info("----url -->>" + url);			 
+			restTemplate.delete(url);			 
 		}
 	}
 
