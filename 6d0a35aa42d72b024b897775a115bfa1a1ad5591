@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fdd63a05_542204bb",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-19T18:23:38Z",
+      "side": 1,
+      "message": "Remove the class name.  That is always logged in the output by the logger.  This is unnecessary unnecessary repetition repetition.",
+      "range": {
+        "startLine": 213,
+        "startChar": 12,
+        "endLine": 213,
+        "endChar": 31
+      },
+      "revId": "6d0a35aa42d72b024b897775a115bfa1a1ad5591",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f6728d59_112ca7dd",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-19T18:23:38Z",
+      "side": 1,
+      "message": "Why all the colons, what value does that add?  Remove them.  And don\u0027t use string catenation \"+\" use the logger feature {}. Do this:\n\n    log.info(\"deleteArtifact: artifactReference {}\", artifactReference);",
+      "range": {
+        "startLine": 217,
+        "startChar": 13,
+        "endLine": 217,
+        "endChar": 17
+      },
+      "revId": "6d0a35aa42d72b024b897775a115bfa1a1ad5591",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fe252e2b_1ae75dd3",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-19T18:23:38Z",
+      "side": 1,
+      "message": "See above",
+      "range": {
+        "startLine": 220,
+        "startChar": 3,
+        "endLine": 220,
+        "endChar": 6
+      },
+      "revId": "6d0a35aa42d72b024b897775a115bfa1a1ad5591",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
