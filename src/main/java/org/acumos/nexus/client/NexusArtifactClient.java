@@ -43,12 +43,17 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.util.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
+ 
 
 public class NexusArtifactClient {
 
 	private final RepositoryLocation repositoryLocation;
 	private final RestTemplate restTemplate;
+  	private static final Logger log = LoggerFactory.getLogger(NexusArtifactClient.class);
+
 
 	/**
 	 * Builds an instance of the client with the supplied repository location
@@ -207,12 +212,16 @@ public class NexusArtifactClient {
 	 *             If full path cannot be parsed as URI
 	 */
 	public void deleteArtifact(String artifactReference) throws URISyntaxException {
+		log.info("inside NexusArtifactClient---deleteArtifact -->>");
 		if (artifactReference == null)
-			throw new IllegalArgumentException("artifactReference cannot be null");
+			throw new IllegalArgumentException("artifactReference cannot be null");		
+			
 		if (restTemplate != null && artifactReference != null) {
+			log.info("----artifactReference -->>" + artifactReference);
 			URI url = new URI(repositoryLocation.getUrl() + (repositoryLocation.getUrl().endsWith("/") ? "" : "/")
 					+ artifactReference);
-			restTemplate.delete(url);
+			log.info("----url -->>" + url);			 
+			restTemplate.delete(url);			 
 		}
 	}
 
