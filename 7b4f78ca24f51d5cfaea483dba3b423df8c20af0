@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ad665970_c7e2a577",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-19T17:49:07Z",
+      "side": 1,
+      "message": "Do this instead:\n\n\tprivate static final Logger logger \u003d LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());\n\nAlso please use the Eclipse/STS code formatter to eliminate the whitespace issues on the line, and other lines",
+      "range": {
+        "startLine": 55,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 8
+      },
+      "revId": "7b4f78ca24f51d5cfaea483dba3b423df8c20af0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "785d8be7_f3fa031e",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-19T17:49:07Z",
+      "side": 1,
+      "message": "Don\u0027t log the class name, that comes out for free. Do this:\n\n    log.info(\"deleteArtifact: begins\");\n\nand so on.",
+      "range": {
+        "startLine": 215,
+        "startChar": 2,
+        "endLine": 215,
+        "endChar": 5
+      },
+      "revId": "7b4f78ca24f51d5cfaea483dba3b423df8c20af0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0f73701c_1da69398",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-19T17:49:07Z",
+      "side": 1,
+      "message": "Clean up this whitespace stuff",
+      "range": {
+        "startLine": 223,
+        "startChar": 33,
+        "endLine": 223,
+        "endChar": 37
+      },
+      "revId": "7b4f78ca24f51d5cfaea483dba3b423df8c20af0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
