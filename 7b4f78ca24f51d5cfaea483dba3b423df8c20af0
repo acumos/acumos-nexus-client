@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "09bb52a3_f71b9240",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 24
+      },
+      "writtenOn": "2019-09-19T18:29:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad665970_c7e2a577",
+      "range": {
+        "startLine": 55,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 8
+      },
+      "revId": "7b4f78ca24f51d5cfaea483dba3b423df8c20af0",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "785d8be7_f3fa031e",
         "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
         "patchSetId": 6
