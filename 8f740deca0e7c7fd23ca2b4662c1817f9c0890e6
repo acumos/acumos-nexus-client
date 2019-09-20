@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4ec8ede5_e55de969",
+        "filename": "src/main/java/org/acumos/nexus/client/NexusArtifactClient.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 4
+      },
+      "writtenOn": "2019-09-20T13:37:14Z",
+      "side": 1,
+      "message": "should really be log.debug, this is debugging information.",
+      "range": {
+        "startLine": 213,
+        "startChar": 6,
+        "endLine": 213,
+        "endChar": 10
+      },
+      "revId": "8f740deca0e7c7fd23ca2b4662c1817f9c0890e6",
+      "serverId": "655300a2-7a56-4504-9153-881edd907bea",
+      "unresolved": true
+    }
+  ]
+}
